@@ -3,14 +3,14 @@ def convert_between_temperature_units(degrees, from_unit, to_unit)
   # (n) C = (n - 273.15) K
   # (n) C = ((n - 32) / 1.8) F
   if from_unit == 'K'
-    degrees += 273.15
+    degrees -= 273.15
   elsif from_unit == 'F'
     degrees = (degrees - 32) / 1.8
   end
 
   # `degrees` are already in `C`
   if to_unit == 'K'
-    degrees - 273.15
+    degrees + 273.15
   elsif to_unit == 'F'
     (degrees * 1.8) + 32
   else
