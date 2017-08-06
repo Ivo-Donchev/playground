@@ -1,7 +1,6 @@
 class CommandParser
   class Argument
-    attr_accessor:handler
-    attr_accessor:command_name
+    attr_accessor:name
 
     def initialize(name, handler)
       @name = name
@@ -14,6 +13,10 @@ class CommandParser
   end
 
   class Option
+    attr_accessor:short_name
+    attr_accessor:long_name
+    attr_accessor:description
+
     def initialize(short_name, long_name, description, handler)
       @short_name = short_name
       @long_name = long_name
@@ -27,6 +30,7 @@ class CommandParser
   end
 
   class OptionWithParameter < Option
+    attr_accessor:parameter
     def initialize(short_name, long_name, description, parameter, handler)
       super(short_name, long_name, description, handler)
       @parameter = parameter
@@ -43,7 +47,7 @@ class CommandParser
       end
 
 
-      @handler.call runner, argument  # TODO: refactor this ?
+      @handler.call runner, argument
     end
   end
 
@@ -71,5 +75,23 @@ class CommandParser
     argv.each_with_index do |element, index|
       @arguments_and_options[index].execute(command_runner, element)
     end
+  end
+
+  def help()
+    arguments = @arguments_and_options.select { |el| el.is_a? Argument }
+    options = @arguments_and_options.select { |el| el.class == Option }
+    options_with_parameters = @arguments_and_options.select { |el| el.class == OptionWithParameter }
+
+    arguments_str = ''
+    arguments_str = " " + arguments.map { |el| "[#{el.name}]" }.join(' ') if not arguments.empty?
+
+    options_str = options.map { |el|
+      "\n    -#{el.short_name}, --#{el.long_name} #{el.description}"
+    }.join('')
+    options_with_parameters_str = options_with_parameters.map { |el|
+      "\n    -#{el.short_name}, --#{el.long_name}=#{el.parameter} #{el.description}"
+    }.join('')
+
+    "Usage: " + @command_name + arguments_str + options_str + options_with_parameters_str
   end
 end
