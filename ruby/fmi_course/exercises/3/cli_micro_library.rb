@@ -25,7 +25,7 @@ class CommandParser
     end
 
     def execute(*handler_arguments)
-      @handler.call handler_arguments[0], true  # TODO: refactor this ?
+      @handler.call handler_arguments[0], true
     end
   end
 
