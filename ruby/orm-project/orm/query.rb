@@ -1,23 +1,32 @@
+require './settings'
+
 #
 class QuerySet
   def initialize(model, db)
     @model = model
     @db = db
-    puts @model
   end
 
   def all
-    @db.execute("SELECT * FROM #{@model.name};")
+    query = "SELECT * FROM #{@model.name};"
+    puts query if Settings::PRINT_SQL
+    @db.execute(query)
+  end
+
+  def update_obj(obj, fields_dict)
+    fields_dict.each { |field_name, val| obj.fields[field_name.to_s].set(val) }
+    obj
   end
 
   def create(**args)
     # TODO: Add validations
-    args.each { |field_name, value| @model.fields[field_name.to_s].set(value) }
+    update_obj(@model, args)
 
     column_names = '(' + args.keys.map(&:to_s).join(', ') + ')'
     values = '(' + args.values.map { |value| "\"#{value}\"" }.join(', ') + ')'
 
     query = "INSERT INTO #{@model.name} #{column_names} VALUES #{values};"
+    puts query if Settings::PRINT_SQL
     @db.execute(query)
   end
 end

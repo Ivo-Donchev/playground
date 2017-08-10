@@ -1,16 +1,25 @@
 require 'sqlite3'
 
-require './orm/query'
 require './settings'
+
+require './orm/query'
+require './orm/fields'
 
 # A base class which presents database table
 class Model
-  def self.objects
-    QuerySet.new(self, db)
-  end
-  # TODO: Add default fields
   class << self
     attr_accessor:fields
+    attr_accessor:default_fields
+  end
+
+  def self.default_fields
+    {
+      'pk' => AutoField.new
+    }
+  end
+
+  def self.objects
+    QuerySet.new(self, db)
   end
 
   def self.db
@@ -19,15 +28,21 @@ class Model
 
   def self.create_table
     query = "CREATE TABLE #{name}"
-    column_pairs = @fields.map { |key, value| [key, value.db_column_name] }
-    columns = column_pairs.map { |key, value| "#{key} #{value}" }
+    column_pairs = default_fields.merge(@fields).map do |k, v|
+      [k, v.db_column_name]
+    end
+
+    columns = column_pairs.map { |k, v| "#{k} #{v}" }
+
     query += "( #{columns.join(', ')} );"
 
+    puts query if Settings::PRINT_SQL
     db.execute(query)
   end
 
   def self.drop_table
-    db.execute("DROP TABLE #{name}")
+    query = "DROP TABLE #{name}"
+    puts query if Settings::PRINT_SQL
+    db.execute(query)
   end
 end
-
