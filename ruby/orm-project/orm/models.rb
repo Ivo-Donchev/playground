@@ -7,15 +7,29 @@ require './orm/fields'
 
 # A base class which presents database table
 class Model
+  attr_accessor:fields
   class << self
     attr_accessor:fields
-    attr_accessor:default_fields
+  end
+
+  def initialize(*keys)
+    @fields = self.class.default_fields.merge(self.class.fields)
+
+    # TODO: Fix this
+    @fields.keys.each_with_index.map { |field_name, index|
+      keys[index]
+      @fields[field_name].set(keys[0][index].to_s)
+    }
   end
 
   def self.default_fields
     {
       'pk' => AutoField.new
     }
+  end
+
+  def self.all_fields
+      default_fields.merge(@fields)
   end
 
   def self.objects
@@ -28,7 +42,7 @@ class Model
 
   def self.create_table
     query = "CREATE TABLE #{name}"
-    column_pairs = default_fields.merge(@fields).map do |k, v|
+    column_pairs = all_fields.map do |k, v|
       [k, v.db_column_name]
     end
 
@@ -41,7 +55,7 @@ class Model
   end
 
   def self.drop_table
-    query = "DROP TABLE #{name}"
+    query = "DROP TABLE #{name};"
     puts query if Settings::PRINT_SQL
     db.execute(query)
   end
