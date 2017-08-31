@@ -17,7 +17,6 @@ class Model
 
     # TODO: Fix this
     @fields.keys.each_with_index.map { |field_name, index|
-      keys[index]
       @fields[field_name].set(keys[0][index].to_s)
     }
   end

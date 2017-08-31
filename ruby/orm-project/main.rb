@@ -7,22 +7,31 @@ User.create_table
 User.objects.create(full_name: 'Ivaylo Donchev', age: 20)
 User.objects.create(full_name: 'Georgi Ivanov', age: 35)
 
-puts "--------------------------------------"
-puts "--------------------------------------"
-puts "--------------------------------------"
+# p User.objects.values
 
-p User.objects.values
+# user = User.objects.all[0]
+# user.fields['full_name'] = 'Pesho'
+# user.save()
 
-user = User.objects.all[0]
-user.fields['full_name'] = 'Pesho'
-user.save()
 
-puts "--------------------------------------"
-puts "--------------------------------------"
-puts "--------------------------------------"
+# p User.objects.values
+# user.delete()
+# p User.objects.values
+all_users =  User.objects
+ordered = all_users.order_by('pk')
+filtered = ordered.filter(pk: 1)
+limited = filtered.limit(10)
 
-p User.objects.values
-user.delete()
-p User.objects.values
+p all_users.all
+ordered.all
+filtered.all
+limited.all
+all_users.values.each { | user |
+  p user['full_name']
+}
+all_users.all.each { | user |
+  p user.fields['full_name'].to_s
+}
+
 
 User.drop_table
