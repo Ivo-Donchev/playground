@@ -1,16 +1,28 @@
 require 'sqlite3'
 require './models'
+require './settings'
 
 User.create_table
 
-# p User.objects.all
 User.objects.create(full_name: 'Ivaylo Donchev', age: 20)
 User.objects.create(full_name: 'Georgi Ivanov', age: 35)
-users = User.objects.all
-users.map do |user|
-  puts 'PK: ' + user.fields['pk'].to_s
-  puts 'Full name: ' + user.fields['full_name'].to_s
-  puts 'Age: ' + user.fields['age'].to_s
-end
+
+puts "--------------------------------------"
+puts "--------------------------------------"
+puts "--------------------------------------"
+
+p User.objects.values
+
+user = User.objects.all[0]
+user.fields['full_name'] = 'Pesho'
+user.save()
+
+puts "--------------------------------------"
+puts "--------------------------------------"
+puts "--------------------------------------"
+
+p User.objects.values
+user.delete()
+p User.objects.values
 
 User.drop_table

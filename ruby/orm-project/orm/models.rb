@@ -59,4 +59,26 @@ class Model
     puts query if Settings::PRINT_SQL
     db.execute(query)
   end
+
+  def save
+    updated_fields_pairs = @fields.select { |field_name, _|
+      not self.class.default_fields.include? field_name
+    }.map { |field_name, new_value|
+      "#{field_name} = '#{new_value}'"
+    }.join(', ')
+    where_clause = "pk = #{fields['pk']}"
+
+    query = "UPDATE #{self.class.name} SET #{updated_fields_pairs} WHERE #{where_clause}"
+
+    puts query if Settings::PRINT_SQL
+    self.class.db.execute(query)
+  end
+
+  def delete
+    where_clause = "pk = #{fields['pk']}"
+    query = "DELETE FROM #{self.class.name} WHERE #{where_clause}"
+
+    puts query if Settings::PRINT_SQL
+    self.class.db.execute(query)
+  end
 end

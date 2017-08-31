@@ -13,10 +13,30 @@ class QuerySet
     @db.execute(query)
   end
 
-  def all
+  def values_list
     query = "SELECT * FROM #{@model.name}"
-    results = execute_query(query)
-    results.map { |result| @model.new(result) }
+    execute_query(query)
+  end
+
+  def values
+    self.values_list.map{ |obj_values_list|
+      Hash[@model.all_fields.keys.zip(obj_values_list)]
+    }
+  end
+
+  def all
+    #TODO: Fix all's causing global state
+    self.values_list.map { |result| @model.new(result) }
+  end
+
+  def filter
+
+  end
+
+  def count(field='*')
+    query = "SELECT COUNT(#{field}) FROM #{@model.name}"
+
+    execute_query(query)
   end
 
   def update_obj(obj, fields_dict)
