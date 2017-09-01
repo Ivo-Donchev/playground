@@ -59,6 +59,14 @@ class QuerySet
     self.values_list.map { |result| @model.new(*result) }
   end
 
+  def last
+    self.order_by('pk', desc=true).limit(1).all()[0]
+  end
+
+  def first
+    self.order_by('pk', desc=false).limit(1).all()[0]
+  end
+
   def order_by(field, desc=false)
     QuerySet.new(@model, @db, @where, @order_by + [field], desc, @limit)
   end
@@ -69,6 +77,10 @@ class QuerySet
       new_where[field_name] = value
     }
     QuerySet.new(@model, @db, new_where, @order_by, @order_by_desc, @limit)
+  end
+
+  def get(get_kwargs)
+    self.filter(get_kwargs).limit(1).all()[0]
   end
 
   def limit(limit_rate)
@@ -86,13 +98,23 @@ class QuerySet
 
   def create(**args)
     # TODO: Add validations
+    related_fields = args.select { |field_name, _| @model.fields[field_name.to_s].class == ForeignKey }
+
+    str_args = args.clone
+    args = args.each do |field_name, value|
+      if related_fields.keys.include? field_name
+        str_args[field_name] = value.fields['pk'].to_s
+      end
+    end
+
     obj = @model.new
     _update_obj(obj, args)
 
-    column_names = "(#{args.keys.map(&:to_s).join(', ')})"
-    values = "(#{args.values.map { |value| "\"#{value}\"" }.join(', ')})"
+    column_names = "(#{str_args.keys.map(&:to_s).join(', ')})"
+    values = "(#{str_args.values.map { |value| "\"#{value}\"" }.join(', ')})"
 
     query = "INSERT INTO #{@model.name} #{column_names} VALUES #{values}"
     execute_query(query)
+    self.last
   end
 end
