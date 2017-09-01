@@ -17,16 +17,17 @@ class Model
     @fields = self.class.default_fields.merge(self.class.fields)
 
     # TODO: Fix this
-    related_fields = @fields.select { |field_name, value| value.class == ForeignKey }
+    related_fields = @fields.select { |_, value| value.class == ForeignKey }
 
-    if not keys.empty?
-      @fields.keys.each_with_index { |field_name, index|
+    unless keys.empty?
+      @fields.keys.each_with_index do  |field_name, index|
         if not related_fields.include? field_name
           @fields[field_name].set(keys[index].to_s)
         else
-          @fields[field_name].set(@fields[field_name.to_s].to_model.objects.get(pk: keys[index]))
+          val = @fields[field_name.to_s].to_model.objects.get(pk: keys[index])
+          @fields[field_name].set(val)
         end
-      }
+      end
     end
   end
 
@@ -54,13 +55,13 @@ class Model
       [k, v.db_column_name]
     }.map { |k, v| "#{k} #{v}" }
 
-    fk_fields = all_fields.select{ |_, value|
+    fk_fields = all_fields.select { |_, value|
       value.class == ForeignKey
     }
     references_str_arr = fk_fields.map { |field_name, value|
        "FOREIGN KEY (#{field_name}) REFERENCES #{value.to_model}(pk)"
     }
-    references_str =  ', ' + references_str_arr.join(', ') if not references_str_arr.empty?
+    references_str =  ', ' + references_str_arr.join(', ') unless references_str_arr.empty?
 
     query += "( #{columns.join(', ')} #{references_str})"
 

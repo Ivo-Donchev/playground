@@ -2,10 +2,8 @@ require './settings'
 
 #
 class QuerySet
-  """
-  all(), values(), count() and values_list() executes the query and returns list
-  """
-  def initialize(model, db, where={}, order_by=[], order_by_desc=false, limit=nil)
+  # all(), values(), count() and values_list() executes the query and returns list
+  def initialize(model, db, where = {}, order_by = [], order_by_desc = false, limit = nil)
     @model = model
     @db = db
 
@@ -16,23 +14,23 @@ class QuerySet
     @limit = limit
   end
 
-  def _get_query(select_fields='*')
+  def _get_query(select_fields = '*')
     where_clause = ''
     order_by_clause = ''
     limit_clause = ''
 
-    if not @where.empty?
-      where_clause = "WHERE " + @where.map { | field_name, value|
-        "#{field_name} = #{value}"
+    unless @where.empty?
+      where_clause = 'WHERE ' + @where.map { | field_name, value|
+        "#{field_name} = '#{value}'"
       }.join(' AND ')
     end
 
-    if not @order_by.empty?
+    unless @order_by.empty?
       order_by_clause = "ORDER BY #{@order_by.join(', ')}"
       order_by_clause << ' DESC' if @order_by_desc
     end
 
-    limit_clause = "LIMIT #{@limit}" if not @limit.nil?
+    limit_clause = "LIMIT #{@limit}" unless @limit.nil?
 
     "SELECT #{select_fields} FROM #{@model.name} #{where_clause} #{order_by_clause} #{limit_clause}"
   end
@@ -49,31 +47,31 @@ class QuerySet
   end
 
   def values
-    self.values_list.map{ |obj_values_list|
+    values_list.map do |obj_values_list|
       Hash[@model.all_fields.keys.zip(obj_values_list)]
-    }
+    end
   end
 
   def all
-    #TODO: Fix all's causing global state
-    self.values_list.map { |result| @model.new(*result) }
+    # TODO: Fix all's causing global state
+    values_list.map { |result| @model.new(*result) }
   end
 
   def last
-    self.order_by('pk', desc=true).limit(1).all()[0]
+    order_by('pk', true).limit(1).all()[0]
   end
 
   def first
-    self.order_by('pk', desc=false).limit(1).all()[0]
+    order_by('pk', false).limit(1).all()[0]
   end
 
-  def order_by(field, desc=false)
+  def order_by(field, desc = false)
     QuerySet.new(@model, @db, @where, @order_by + [field], desc, @limit)
   end
 
   def filter(filter_by_kwargs)
     new_where = @where.clone
-    filter_by_kwargs.each { | field_name, value |
+    filter_by_kwargs.each { |field_name, value|
       new_where[field_name] = value
     }
     QuerySet.new(@model, @db, new_where, @order_by, @order_by_desc, @limit)
@@ -89,7 +87,7 @@ class QuerySet
 
   def count(field='*')
     query = _get_query("COUNT(#{field})")
-    execute_query(query)
+    execute_query(query)[0][0]
   end
 
   def _update_obj(obj, fields_dict)

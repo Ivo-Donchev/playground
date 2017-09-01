@@ -7,15 +7,31 @@ RSpec.describe QuerySet do
     Profile.create_table
 
     it 'orders_by_given_field' do
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
       qs = User.objects.order_by('pk')
       expect(qs.first.fields['pk'].to_s).to be >= qs.last.fields['pk'].to_s
     end
     it 'orders_by_given_field_desc' do
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      qs = User.objects.order_by('pk', desc=true)
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      qs = User.objects.order_by('pk', true)
       expect(qs.first.fields['pk'].to_s).to be <= qs.last.fields['pk'].to_s
     end
   end
@@ -23,33 +39,74 @@ RSpec.describe QuerySet do
   describe '#count' do
     it 'returns_count_of_given_field' do
       users_count = User.objects.count
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
       expect(User.objects.count.class).to eq Fixnum
-      expect(User.objects.count).to eq (users_count + 2)
+      expect(User.objects.count).to eq(users_count + 2)
     end
   end
 
   describe '#create' do
     it 'creates_and_saves_new_istance' do
       users_count = User.objects.count
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
       expect(User.objects.count).to eq(users_count + 1)
     end
   end
 
   describe '#filter' do
     it 'filters_by_kwargs' do
-      user = User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      user = User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
       expect(User.objects.filter(pk: user.fields['pk']).count).to eq 1
     end
 
     it 'allows_chaining' do
-      user = User.objects.create(full_name: 'ivo1', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo1', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
-      User.objects.create(full_name: 'ivo1', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      user = User.objects.create(
+        full_name: 'ivo1',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo1',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
+      User.objects.create(
+        full_name: 'ivo1',
+        age: 22,
+        profile: Profile.objects.create(avatar: 'snimka.png')
+      )
       users = User.objects.filter(full_name: 'ivo1')
       expect(users.count).to eq 3
       expect(users.filter(pk: user.fields['pk']).count).to eq 1
@@ -65,7 +122,9 @@ RSpec.describe QuerySet do
 
   describe '#get' do
     it 'returns_model_instance' do
-      user = User.objects.create(full_name: 'ivo1', age: 22, profile: Profile.objects.create(avatar: 'snimka.png'))
+      user = User.objects.create(full_name: 'ivo1',
+                                 age: 22,
+                                 profile: Profile.objects.create(avatar: 'snimka.png'))
       expect(User.objects.get(pk: user.fields['pk']).class).to eq User
     end
 
