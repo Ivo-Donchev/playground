@@ -75,11 +75,15 @@ class Model
     db.execute(query)
   end
 
-  def save
+  def update
     updated_fields_pairs = @fields.select { |field_name, _|
       not self.class.default_fields.include? field_name
     }.map { |field_name, new_value|
-      "#{field_name} = '#{new_value}'"
+      if new_value.class == ForeignKey
+        "#{field_name} = '#{new_value.to_s}'"
+      else
+        "#{field_name} = '#{new_value}'"
+      end
     }.join(', ')
 
     query = "UPDATE #{self.class.name} SET #{updated_fields_pairs} WHERE pk = #{fields['pk']}"
