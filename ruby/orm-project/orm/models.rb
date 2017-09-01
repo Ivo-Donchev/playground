@@ -14,7 +14,6 @@ class Model
 
   def initialize(*keys)
     @fields = self.class.default_fields.merge(self.class.fields)
-    p keys
 
     # TODO: Fix this
     if not keys.empty?
@@ -42,11 +41,9 @@ class Model
 
   def self.create_table
     query = "CREATE TABLE #{name}"
-    column_pairs = all_fields.map do |k, v|
+    columns = all_fields.map { |k, v|
       [k, v.db_column_name]
-    end
-
-    columns = column_pairs.map { |k, v| "#{k} #{v}" }
+    }.map { |k, v| "#{k} #{v}" }
 
     query += "( #{columns.join(', ')} );"
 
@@ -56,6 +53,7 @@ class Model
 
   def self.drop_table
     query = "DROP TABLE #{name};"
+
     puts query if Settings::PRINT_SQL
     db.execute(query)
   end
@@ -66,17 +64,15 @@ class Model
     }.map { |field_name, new_value|
       "#{field_name} = '#{new_value}'"
     }.join(', ')
-    where_clause = "pk = #{fields['pk']}"
 
-    query = "UPDATE #{self.class.name} SET #{updated_fields_pairs} WHERE #{where_clause}"
+    query = "UPDATE #{self.class.name} SET #{updated_fields_pairs} WHERE pk = #{fields['pk']}"
 
     puts query if Settings::PRINT_SQL
     self.class.db.execute(query)
   end
 
   def delete
-    where_clause = "pk = #{fields['pk']}"
-    query = "DELETE FROM #{self.class.name} WHERE #{where_clause}"
+    query = "DELETE FROM #{self.class.name} WHERE pk = #{fields['pk']}"
 
     puts query if Settings::PRINT_SQL
     self.class.db.execute(query)

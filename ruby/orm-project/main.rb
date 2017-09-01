@@ -9,9 +9,9 @@ User.objects.create(full_name: 'Georgi Ivanov', age: 35)
 
 # p User.objects.values
 
-# user = User.objects.all[0]
-# user.fields['full_name'] = 'Pesho'
-# user.save()
+user = User.objects.all[0]
+user.fields['full_name'] = 'Pesho'
+user.save()
 
 
 # p User.objects.values
@@ -32,6 +32,7 @@ all_users.values.each { | user |
 all_users.all.each { | user |
   # p user.class.model_fields['full_name'].to_s
   p user.fields['full_name'].to_s
+  user.delete()
 }
 
 

@@ -8,6 +8,8 @@ class QuerySet
   def initialize(model, db, where={}, order_by=[], order_by_desc=false, limit=nil)
     @model = model
     @db = db
+
+    # Query related
     @where = where
     @order_by = order_by # field_names
     @order_by_desc = order_by_desc
@@ -26,15 +28,11 @@ class QuerySet
     end
 
     if not @order_by.empty?
-      order_by_clause = 'ORDER BY ' + @order_by.join(', ')
-      if @order_by_desc
-        order_by_clause += ' DESC'
-      end
+      order_by_clause = "ORDER BY #{@order_by.join(', ')}"
+      order_by_clause << ' DESC' if @order_by_desc
     end
 
-    if not @limit.nil?
-      limit_clause = "LIMIT #{@limit}"
-    end
+    limit_clause = "LIMIT #{@limit}" if not @limit.nil?
 
     "SELECT #{select_fields} FROM #{@model.name} #{where_clause} #{order_by_clause} #{limit_clause}"
   end
@@ -91,8 +89,8 @@ class QuerySet
     obj = @model.new
     _update_obj(obj, args)
 
-    column_names = '(' + args.keys.map(&:to_s).join(', ') + ')'
-    values = '(' + args.values.map { |value| "\"#{value}\"" }.join(', ') + ')'
+    column_names = "(#{args.keys.map(&:to_s).join(', ')})"
+    values = "(#{args.values.map { |value| "\"#{value}\"" }.join(', ')})"
 
     query = "INSERT INTO #{@model.name} #{column_names} VALUES #{values}"
     execute_query(query)
