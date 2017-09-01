@@ -58,7 +58,7 @@ class QuerySet
 
   def all
     #TODO: Fix all's causing global state
-    self.values_list.map { |result| @model.new(result) }
+    self.values_list.map { |result| @model.new(*result) }
   end
 
   def order_by(field, desc=false)
@@ -84,12 +84,12 @@ class QuerySet
 
   def _update_obj(obj, fields_dict)
     fields_dict.each { |field_name, val| obj.fields[field_name.to_s].set(val) }
-    obj
   end
 
   def create(**args)
     # TODO: Add validations
-    _update_obj(@model, args)
+    obj = @model.new
+    _update_obj(obj, args)
 
     column_names = '(' + args.keys.map(&:to_s).join(', ') + ')'
     values = '(' + args.values.map { |value| "\"#{value}\"" }.join(', ') + ')'

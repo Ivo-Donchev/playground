@@ -30,6 +30,7 @@ all_users.values.each { | user |
   p user['full_name']
 }
 all_users.all.each { | user |
+  # p user.class.model_fields['full_name'].to_s
   p user.fields['full_name'].to_s
 }
 

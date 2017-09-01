@@ -14,17 +14,18 @@ class Model
 
   def initialize(*keys)
     @fields = self.class.default_fields.merge(self.class.fields)
+    p keys
 
     # TODO: Fix this
-    @fields.keys.each_with_index.map { |field_name, index|
-      @fields[field_name].set(keys[0][index].to_s)
-    }
+    if not keys.empty?
+      @fields.keys.each_with_index { |field_name, index|
+        @fields[field_name].set(keys[index].to_s)
+      }
+    end
   end
 
   def self.default_fields
-    {
-      'pk' => AutoField.new
-    }
+    { 'pk' => AutoField.new }
   end
 
   def self.all_fields
