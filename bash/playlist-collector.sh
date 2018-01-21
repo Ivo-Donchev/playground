@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+# Usage: ./playlist-collector -d=<destination-folder> -p=<youtube-playlist-link>
+
 DIRECTORY="songs"
 PLAYLIST_LINK=""
 
