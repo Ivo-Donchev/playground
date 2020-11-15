@@ -16,7 +16,7 @@ def with_single_thread():
         cpu_heavy()
 
 
-def with_multiple_threadsasync():
+def with_multiple_threads():
     threads = []
     for i in range(50):
         thread = threading.Thread(target=cpu_heavy)
@@ -35,7 +35,7 @@ def main():
     print('Without threads: ' , time.time() - start)
 
     start = time.time()
-    with_multiple_threadsasync()
+    with_multiple_threads()
     print('With threads: ' , time.time() - start)
 
 
