@@ -1,6 +1,6 @@
 import time
 import requests
-import threading
+import multiprocessing
 
 
 def cpu_heavy():
@@ -11,31 +11,31 @@ def cpu_heavy():
         result += 'a'
 
 
-def with_single_thread():
+def run():
     for i in range(50):
         cpu_heavy()
 
 
-def with_multiple_threadsasync():
-    threads = []
+def run_async():
+    processes = []
     for i in range(50):
-        thread = threading.Thread(target=cpu_heavy)
-        thread.start()
-        threads.append(thread)
+        process = multiprocessing.Process(target=cpu_heavy)
+        process.start()
+        processes.append(process)
 
-    for thread in threads:
-        thread.join()
+    for process in processes:
+        process.join()
 
 
 def main():
     print('Running....')
 
     start = time.time()
-    with_single_thread()
+    run()
     print('Without threads: ' , time.time() - start)
 
     start = time.time()
-    with_multiple_threadsasync()
+    run_async()
     print('With threads: ' , time.time() - start)
 
 

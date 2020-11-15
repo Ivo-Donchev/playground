@@ -3,16 +3,16 @@ import requests
 import threading
 
 
-def run():
+def with_single_thread():
     for i in range(30):
-        requests.get('http://abv.bg')
+        print(requests.get('http://abv.bg'))
 
 
-def run_async():
+def with_multiple_threads():
     threads = []
 
     for i in range(30):
-        thread = threading.Thread(target=requests.get, args=('http://abv.bg',))
+        thread = threading.Thread(target=lambda url: print(requests.get(url)), args=('http://abv.bg',))
         thread.start()
         threads.append(thread)
 
@@ -31,11 +31,11 @@ def main():
     print('Running....')
 
     start = time.time()
-    run()
+    with_single_thread()
     print('Without threads: ' , time.time() - start)
 
     start = time.time()
-    run_async()
+    with_multiple_threads()
     print('With threads: ' , time.time() - start)
 
 if __name__ == '__main__':
