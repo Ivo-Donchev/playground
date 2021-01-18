@@ -2,3 +2,5 @@
 *~
 *.swp
 *.swn
+node_modules/
+angular/node_modules/*
